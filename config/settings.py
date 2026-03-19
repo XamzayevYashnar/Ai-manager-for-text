@@ -80,9 +80,8 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_DIRS = [
-    BASE_DIR / 'static',            # umumiy static papka
-    BASE_DIR / 'editor/static',     # app static papka
-    BASE_DIR / 'users/static',      # user app static papka
+    BASE_DIR / 'editor' / 'static',
+    BASE_DIR / 'users' / 'static',
 ]
 
 MEDIA_URL = '/media/'

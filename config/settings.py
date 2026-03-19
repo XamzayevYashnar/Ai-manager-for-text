@@ -21,7 +21,6 @@ load_dotenv()
 SECRET_KEY = os.getenv("SECRET_KEY", "django-insecure-default-key")  # .env dagi key
 DEBUG = os.getenv("DEBUG", "False") == "True"
 
-ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "*").split(",")  # Render domenini shu yerga qo'yish
 
 
 # Application definition
@@ -48,6 +47,10 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'config.urls'
+
+ALLOWED_HOSTS = [
+    "ai-manager-for-text.onrender.com"
+]
 
 CSRF_TRUSTED_ORIGINS = [
     "https://ai-manager-for-text.onrender.com"

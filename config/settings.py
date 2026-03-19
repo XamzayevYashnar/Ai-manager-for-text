@@ -50,7 +50,7 @@ MIDDLEWARE = [
 ROOT_URLCONF = 'config.urls'
 
 CSRF_TRUSTED_ORIGINS = [
-    "https://my-ai-app.onrender.com"
+    "https://ai-manager-for-text.onrender.com"
 ]
 
 TEMPLATES = [

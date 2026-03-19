@@ -79,16 +79,10 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
-# ===== Static & Media =====
+# Static / Media
 STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles'
-
-# Agar papkalar deployda yo‘q bo‘lsa, STATICFILES_DIRS bo‘sh qoldiriladi
-STATICFILES_DIRS = []
-for app in ['editor', 'users']:
-    static_path = BASE_DIR / app / 'static'
-    if static_path.exists():
-        STATICFILES_DIRS.append(static_path)
+STATIC_ROOT = BASE_DIR / 'staticfiles'  # collectstatic keyin barcha fayllar shu yerga tushadi
+STATICFILES_DIRS = [BASE_DIR / 'editor' / 'static', BASE_DIR / 'users' / 'static']
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'

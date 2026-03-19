@@ -1,0 +1,11 @@
+{% for page in pages %}
+    <a href="{{ page.get_absolute_url }}" class="page-link {% if page.slug == slug %}active{% endif %}">
+        <i class="fa-regular fa-message"></i>
+        <span class="page-name">{{ page.name|truncatechars:20 }}</span>
+        {% if page.slug == slug %}
+            <i class="fa-solid fa-chevron-right current-icon"></i>
+        {% endif %}
+    </a>
+{% empty %}
+    <div class="no-chats">You haven't any chats</div>
+{% endfor %}

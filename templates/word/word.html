@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MEGA WORD PROFESSIONAL | DJANGO ULTRA</title>
+    
+    <!-- Django Static -->
+    {% load static %}
+    
+    <!-- Font Awesome 6 Pro (CDN) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <!-- Bootstrap 5 (faqat grid va modal uchun) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Toastr (chiroyli bildirishnomalar) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+    
+    <!-- jQuery (toastr uchun) -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
+    <!-- Quill.js (Rich Text Editor) - eng kuchli editorlardan biri -->
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+    
+    <!-- html2pdf + html2canvas -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
+    <!-- Chart.js (statistika uchun) -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Moment.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+    
+    <style>
+        /* ========== GLOBAL STYLES ========== */
+        :root {
+            --office-blue: #2b579a;
+            --office-dark: #1e3c72;
+            --office-light: #f3f2f1;
+            --accent-green: #28a745;
+            --accent-red: #dc3545;
+            --accent-gold: #ffc107;
+            --text-primary: #323130;
+            --border-color: #d0d0d0;
+            --ribbon-height: 120px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+        }
+
+        body {
+            background: #e5e5e5;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ========== SCROLLBAR STYLING ========== */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #888; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #555; }
+
+        /* ========== TITLE BAR ========== */
+        .title-bar {
+            background: var(--office-blue);
+            color: white;
+            height: 42px;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            justify-content: space-between;
+            font-size: 15px;
+            font-weight: 400;
+            border-bottom: 1px solid #1e3c72;
+            flex-shrink: 0;
+        }
+
+        .window-controls {
+            display: flex;
+            gap: 16px;
+        }
+        .window-controls i {
+            cursor: pointer;
+            padding: 6px;
+            border-radius: 3px;
+            transition: 0.2s;
+        }
+        .window-controls i:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        /* ========== MEGA RIBBON ========== */
+        .ribbon-container {
+            background: var(--office-light);
+            border-bottom: 2px solid var(--border-color);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            flex-shrink: 0;
+        }
+
+        .ribbon-tabs {
+            display: flex;
+            padding-left: 20px;
+            gap: 2px;
+            background: var(--office-blue);
+            height: 32px;
+        }
+
+        .ribbon-tab {
+            padding: 6px 18px;
+            color: white;
+            font-size: 13px;
+            cursor: pointer;
+            border-radius: 6px 6px 0 0;
+            transition: all 0.15s;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+        }
+        .ribbon-tab i { margin-right: 6px; font-size: 12px; }
+        .ribbon-tab.active {
+            background: var(--office-light);
+            color: var(--office-blue);
+            font-weight: 600;
+        }
+        .ribbon-tab:hover:not(.active) { background: #3c6eb0; }
+
+        .ribbon-content {
+            padding: 10px 15px;
+            background: var(--office-light);
+            display: flex;
+            gap: 25px;
+            flex-wrap: wrap;
+            min-height: 88px;
+        }
+
+        .ribbon-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            border-right: 1px solid #ccc;
+            padding-right: 20px;
+            min-width: 110px;
+        }
+
+        .group-buttons {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-bottom: 4px;
+        }
+
+        .group-label {
+            font-size: 10px;
+            color: #5a5a5a;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+
+        .ribbon-btn {
+            background: white;
+            border: 1px solid #bbb;
+            border-radius: 4px;
+            padding: 6px 10px;
+            cursor: pointer;
+            font-size: 13px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: 0.15s;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+        .ribbon-btn i { font-size: 14px; color: #444; }
+        .ribbon-btn:hover {
+            background: #e6effa;
+            border-color: var(--office-blue);
+        }
+        .ribbon-btn.large {
+            padding: 8px 16px;
+            font-weight: 600;
+        }
+
+        .dropdown-btn {
+            background: white;
+            border: 1px solid #bbb;
+            border-radius: 4px;
+            padding: 5px;
+            cursor: pointer;
+        }
+
+        /* ========== EDITOR TOOLBAR (qo'shimcha tez tugmalar) ========== */
+        .quick-toolbar {
+            background: #f9f9f9;
+            padding: 6px 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .tool-separator {
+            width: 1px;
+            height: 24px;
+            background: #ccc;
+            margin: 0 5px;
+        }
+
+        /* ========== MAIN WORKSPACE ========== */
+        .workspace {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+            background: #d9d9d9;
+            position: relative;
+        }
+
+        /* Side Panel (kengaytirilgan) */
+        .side-panel {
+            width: 260px;
+            background: #f4f4f4;
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            transition: width 0.2s;
+            overflow-y: auto;
+            flex-shrink: 0;
+        }
+
+        .panel-header {
+            padding: 15px;
+            background: #e8e8e8;
+            font-weight: 600;
+            border-bottom: 1px solid #ccc;
+        }
+
+        .document-thumb {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+            cursor: pointer;
+            transition: 0.1s;
+        }
+        .document-thumb:hover { background: #e0e0e0; }
+        .document-thumb.active { background: #cce5ff; border-left: 4px solid var(--office-blue); }
+
+        /* Asosiy editor maydoni */
+        .editor-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* A4 qog'oz */
+        .a4-paper {
+            width: 210mm;
+            min-height: 297mm;
+            background: white;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.25);
+            padding: 2.54cm;
+            border-radius: 3px;
+            margin-bottom: 30px;
+            transition: box-shadow 0.3s;
+            position: relative;
+        }
+        .a4-paper:focus-within { box-shadow: 0 15px 50px rgba(0,80,160,0.3); }
+
+        /* Quill editor maxsus */
+        .ql-container { 
+            font-size: 14px;
+            border: none !important;
+        }
+        .ql-editor { 
+            padding: 0;
+            min-height: 250mm;
+        }
+
+        /* O'ng panel (xususiyatlar) */
+        .properties-panel {
+            width: 280px;
+            background: #f4f4f4;
+            border-left: 1px solid var(--border-color);
+            padding: 15px;
+            overflow-y: auto;
+            flex-shrink: 0;
+        }
+
+        .prop-section {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px dashed #aaa;
+        }
+
+        /* Status bar */
+        .status-bar {
+            background: var(--office-blue);
+            color: white;
+            height: 28px;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            flex-shrink: 0;
+        }
+
+        /* Modal oynalar */
+        .modal-content {
+            border-radius: 10px;
+        }
+
+        /* Statistika kartochkalari */
+        .stats-card {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 15px;
+        }
+
+        /* Responsive */
+        @media print {
+            body { visibility: hidden; }
+            .a4-paper { visibility: visible; position: absolute; left: 0; top: 0; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- CSRF Token -->
+<form id="csrf-form">{% csrf_token %}</form>
+
+<!-- ========== TITLE BAR ========== -->
+<div class="title-bar">
+    <div><i class="fas fa-file-word" style="margin-right: 10px;"></i> <strong>MEGA WORD ULTRA</strong> | Hujjat - O'zbekiston Respublikasi.docx [Django Enterprise]</div>
+    <div class="window-controls">
+        <i class="fas fa-minus"></i>
+        <i class="far fa-square"></i>
+        <i class="fas fa-times"></i>
+    </div>
+</div>
+
+<!-- ========== RIBBON ========== -->
+<div class="ribbon-container">
+    <div class="ribbon-tabs">
+        <div class="ribbon-tab active"><i class="fas fa-home"></i> Asosiy</div>
+        <div class="ribbon-tab"><i class="fas fa-plus-circle"></i> Qo'shish</div>
+        <div class="ribbon-tab"><i class="fas fa-paint-brush"></i> Dizayn</div>
+        <div class="ribbon-tab"><i class="fas fa-chart-bar"></i> Maket</div>
+        <div class="ribbon-tab"><i class="fas fa-envelope"></i> Xatlar</div>
+        <div class="ribbon-tab"><i class="fas fa-eye"></i> Ko'rinish</div>
+        <div class="ribbon-tab"><i class="fas fa-cog"></i> Sozlamalar</div>
+    </div>
+
+    <div class="ribbon-content" id="ribbonHome">
+        <!-- GROUP 1: Clipboard -->
+        <div class="ribbon-group">
+            <div class="group-buttons">
+                <button class="ribbon-btn large" onclick="execQuill('paste')"><i class="fas fa-paste"></i> Paste</button>
+                <button class="ribbon-btn" onclick="execQuill('copy')"><i class="fas fa-copy"></i></button>
+                <button class="ribbon-btn" onclick="execQuill('cut')"><i class="fas fa-cut"></i></button>
+            </div>
+            <span class="group-label">Almashish</span>
+        </div>
+
+        <!-- GROUP 2: Font -->
+        <div class="ribbon-group">
+            <div class="group-buttons" style="width:200px;">
+                <select class="form-select form-select-sm" id="fontFamily" onchange="changeFont()" style="width:110px;">
+                    <option value="Arial">Arial</option>
+                    <option value="Times New Roman">Times New Roman</option>
+                    <option value="Verdana">Verdana</option>
+                    <option value="Courier New">Courier New</option>
+                    <option value="Georgia">Georgia</option>
+                    <option value="Tahoma">Tahoma</option>
+                </select>
+                <select class="form-select form-select-sm" id="fontSize" onchange="changeSize()" style="width:70px;">
+                    <option value="10px">10</option>
+                    <option value="12px">12</option>
+                    <option value="14px">14</option>
+                    <option value="18px">18</option>
+                    <option value="24px">24</option>
+                    <option value="36px">36</option>
+                    <option value="48px">48</option>
+                </select>
+            </div>
+            <div class="group-buttons">
+                <button class="ribbon-btn" onclick="execQuill('bold')"><i class="fas fa-bold"></i></button>
+                <button class="ribbon-btn" onclick="execQuill('italic')"><i class="fas fa-italic"></i></button>
+                <button class="ribbon-btn" onclick="execQuill('underline')"><i class="fas fa-underline"></i></button>
+                <button class="ribbon-btn" onclick="execQuill('strike')"><i class="fas fa-strikethrough"></i></button>
+                <input type="color" class="ribbon-btn" id="textColor" style="width:40px;" onchange="changeColor()">
+                <input type="color" class="ribbon-btn" id="bgColor" style="width:40px;" onchange="changeBgColor()">
+            </div>
+            <span class="group-label">Shrift</span>
+        </div>
+
+        <!-- GROUP 3: Paragraph -->
+        <div class="ribbon-group">
+            <div class="group-buttons">
+                <button class="ribbon-btn" onclick="execQuill('align', 'left')"><i class="fas fa-align-left"></i></button>
+                <button class="ribbon-btn" onclick="execQuill('align', 'center')"><i class="fas fa-align-center"></i></button>
+                <button class="ribbon-btn" onclick="execQuill('align', 'right')"><i class="fas fa-align-right"></i></button>
+                <button class="ribbon-btn" onclick="execQuill('align', 'justify')"><i class="fas fa-align-justify"></i></button>
+            </div>
+            <div class="group-buttons">
+                <button class="ribbon-btn" onclick="execQuill('list', 'ordered')"><i class="fas fa-list-ol"></i></button>
+                <button class="ribbon-btn" onclick="execQuill('list', 'bullet')"><i class="fas fa-list-ul"></i></button>
+                <button class="ribbon-btn" onclick="execQuill('indent', '+1')"><i class="fas fa-indent"></i></button>
+                <button class="ribbon-btn" onclick="execQuill('indent', '-1')"><i class="fas fa-outdent"></i></button>
+            </div>
+            <span class="group-label">Abzats</span>
+        </div>
+
+        <!-- GROUP 4: Styles -->
+        <div class="ribbon-group">
+            <div class="group-buttons">
+                <button class="ribbon-btn"><i class="fas fa-heading"></i> Sarlavha</button>
+                <button class="ribbon-btn"><i class="fas fa-quote-right"></i> Quote</button>
+                <button class="ribbon-btn"><i class="fas fa-code"></i> Code</button>
+            </div>
+            <span class="group-label">Uslublar</span>
+        </div>
+
+        <!-- GROUP 5: Insert -->
+        <div class="ribbon-group">
+            <div class="group-buttons">
+                <button class="ribbon-btn" onclick="insertImage()"><i class="fas fa-image"></i></button>
+                <button class="ribbon-btn" onclick="insertTable()"><i class="fas fa-table"></i></button>
+                <button class="ribbon-btn" onclick="insertLink()"><i class="fas fa-link"></i></button>
+                <button class="ribbon-btn" onclick="insertDate()"><i class="fas fa-calendar"></i></button>
+            </div>
+            <span class="group-label">Qo'shish</span>
+        </div>
+    </div>
+</div>
+
+<!-- ========== QUICK TOOLBAR ========== -->
+<div class="quick-toolbar">
+    <button class="ribbon-btn" onclick="undo()"><i class="fas fa-undo-alt"></i> Bekor</button>
+    <button class="ribbon-btn" onclick="redo()"><i class="fas fa-redo-alt"></i> Qaytar</button>
+    <div class="tool-separator"></div>
+    <button class="ribbon-btn" onclick="findReplace()"><i class="fas fa-search"></i> Topish</button>
+    <button class="ribbon-btn" onclick="wordCount()"><i class="fas fa-calculator"></i> Statistika</button>
+    <div class="tool-separator"></div>
+    <button class="ribbon-btn text-success" onclick="saveToDjango()"><i class="fas fa-save"></i> Django-ga saqlash</button>
+    <button class="ribbon-btn text-primary" onclick="loadFromDjango()"><i class="fas fa-download"></i> Yuklash</button>
+    <button class="ribbon-btn text-danger" onclick="exportPDF()"><i class="fas fa-file-pdf"></i> PDF</button>
+    <button class="ribbon-btn" onclick="printDoc()"><i class="fas fa-print"></i> Print</button>
+    <span style="margin-left: auto;" id="liveWordCount">So'z: 0 | Belgi: 0</span>
+</div>
+
+<!-- ========== MAIN WORKSPACE ========== -->
+<div class="workspace">
+    <!-- Chap panel - hujjatlar -->
+    <div class="side-panel">
+        <div class="panel-header">
+            <i class="fas fa-file-alt"></i> Mening hujjatlarim
+            <button class="btn btn-sm btn-success float-end" onclick="newDocument()" style="padding: 2px 8px;">+ Yangi</button>
+        </div>
+        <div class="document-thumb active" id="doc1" onclick="switchDocument(1)">
+            <i class="fas fa-file-word"></i> <strong>Hujjat 1</strong><br>
+            <small>Oxirgi: 12.03.2026</small>
+        </div>
+        <div class="document-thumb" id="doc2" onclick="switchDocument(2)">
+            <i class="fas fa-file-word"></i> <strong>Hujjat 2</strong><br>
+            <small>Oxirgi: 15.03.2026</small>
+        </div>
+        <div class="document-thumb" id="doc3" onclick="switchDocument(3)">
+            <i class="fas fa-file-word"></i> <strong>Hujjat 3</strong><br>
+            <small>Qoralama</small>
+        </div>
+        <div class="panel-header" style="border-top:1px solid #ccc; margin-top:10px;">
+            <i class="fas fa-clock"></i> So'nggi fayllar
+        </div>
+        <div style="padding:10px;">
+            <p><i class="far fa-file"></i> loyiha.docx</p>
+            <p><i class="far fa-file"></i> hisobot.docx</p>
+            <p><i class="far fa-file"></i> shartnoma.docx</p>
+        </div>
+    </div>
+
+    <!-- Asosiy editor -->
+    <div class="editor-area" id="editorArea">
+        <div class="a4-paper" id="paperContainer">
+            <!-- Quill editor -->
+            <div id="editor" style="height: 100%;">
+                <h1 style="text-align: center;">O'ZBEKISTON RESPUBLIKASI</h1>
+                <h2 style="text-align: center;">OLIY TA'LIM, FAN VA INNOVATSIYALAR VAZIRLIGI</h2>
+                <p><br></p>
+                <p><strong>BUYRUQ</strong></p>
+                <p><br></p>
+                <p><strong>1. Umumiy qoidalar</strong></p>
+                <p>Ushbu hujjat O'zbekiston Respublikasi Qonunchiligi asosida tayyorlandi.</p>
+                <p><br></p>
+                <p><strong>2. Asosiy qism</strong></p>
+                <ul>
+                    <li>Birinchi band - innovatsion rivojlantirish</li>
+                    <li>Ikkinchi band - raqamlashtirish</li>
+                    <li>Uchinchi band - xalqaro hamkorlik</li>
+                </ul>
+                <p><br></p>
+                <p><em>Imzo: ___________________</em></p>
+                <p><em>Sana: 16.03.2026</em></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- O'ng panel - xususiyatlar -->
+    <div class="properties-panel">
+        <h6><i class="fas fa-sliders-h"></i> Xususiyatlar</h6>
+        <div class="prop-section">
+            <label>Sahifa o'lchami</label>
+            <select class="form-select form-select-sm">
+                <option selected>A4 (210x297mm)</option>
+                <option>A5</option>
+                <option>Letter</option>
+            </select>
+            <label class="mt-2">Yo'nalish</label>
+            <div>
+                <button class="btn btn-sm btn-outline-primary"><i class="fas fa-arrow-up"></i> Vertikal</button>
+                <button class="btn btn-sm btn-outline-primary"><i class="fas fa-arrow-right"></i> Gorizontal</button>
+            </div>
+        </div>
+
+        <div class="prop-section">
+            <label>Shrift o'lchami</label>
+            <p id="showFontSize">14px</p>
+            <label>Hizalama</label>
+            <p id="showAlign">Chap</p>
+        </div>
+
+        <div class="prop-section">
+            <h6>Statistika</h6>
+            <canvas id="statsChart" width="200" height="150"></canvas>
+            <p class="mt-2">So'zlar: <span id="statWords">0</span></p>
+            <p>Belgilar: <span id="statChars">0</span></p>
+            <p>Xatboshilar: <span id="statParas">0</span></p>
+        </div>
+
+        <div class="prop-section">
+            <button class="btn btn-warning btn-sm w-100" onclick="showHistory()"><i class="fas fa-history"></i> Versiyalar tarixi</button>
+            <button class="btn btn-info btn-sm w-100 mt-2" onclick="exportHTML()"><i class="fas fa-code"></i> HTML eksport</button>
+        </div>
+    </div>
+</div>
+
+<!-- ========== STATUS BAR ========== -->
+<div class="status-bar">
+    <div><i class="fas fa-info-circle"></i> Sahifa 1 / 1 | So'z: <span id="statusWords">0</span> | Belgilar: <span id="statusChars">0</span></div>
+    <div><i class="fas fa-globe"></i> O'zbek (lotin) | <i class="fas fa-check-circle text-success"></i> Saqlangan | <i class="fas fa-expand-alt"></i> 100%</div>
+</div>
+
+<!-- ========== MODAL OYNALAR ========== -->
+<!-- Rasm qo'shish modal -->
+<div class="modal fade" id="imageModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fas fa-image"></i> Rasm qo'shish</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="url" class="form-control" id="imageUrl" placeholder="Rasm URL manzili">
+                <p class="mt-2">Yoki kompyuterdan yuklash</p>
+                <input type="file" class="form-control" id="imageFile" accept="image/*">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Bekor</button>
+                <button type="button" class="btn btn-primary" onclick="insertImageFromModal()">Qo'shish</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Jadval qo'shish modal -->
+<div class="modal fade" id="tableModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fas fa-table"></i> Jadval sozlamalari</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <label>Qatorlar</label>
+                <input type="number" id="tableRows" class="form-control" value="3" min="1">
+                <label class="mt-2">Ustunlar</label>
+                <input type="number" id="tableCols" class="form-control" value="4" min="1">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="insertTableFromModal()">Yaratish</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Statistika modal -->
+<div class="modal fade" id="statsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Hujjat statistikasi</h5>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="stats-card">
+                            <h6>So'zlar soni</h6>
+                            <h2 id="statsWordsDetail">0</h2>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="stats-card">
+                            <h6>Belgilar (probel bilan)</h6>
+                            <h2 id="statsCharsWithSpace">0</h2>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-md-6">
+                        <div class="stats-card">
+                            <h6>Belgilar (probel)</h6>
+                            <h2 id="statsCharsNoSpace">0</h2>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="stats-card">
+                            <h6>Xatboshilar</h6>
+                            <h2 id="statsParagraphs">0</h2>
+                        </div>
+                    </div>
+                </div>
+                <canvas id="detailChart" width="400" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Toastr -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+<script>
+    // =====================================================
+    // MEGA WORD ENGINE - QUILL.JS BILAN ISHLAYDI
+    // =====================================================
+    toastr.options = { "positionClass": "toast-top-right", "progressBar": true };
+
+    var quill;
+    document.addEventListener("DOMContentLoaded", function() {
+        // Quill editorni ishga tushirish
+        quill = new Quill('#editor', {
+            theme: 'snow',
+            modules: {
+                toolbar: false,  // biz o'zimizni toolbar ishlatamiz
+                clipboard: { matchVisual: false },
+                history: { delay: 1000, maxStack: 500, userOnly: true }
+            },
+            placeholder: 'Hujjat matnini kiriting...',
+            readOnly: false
+        });
+
+        // O'zgarishlarni kuzatish
+        quill.on('text-change', function() {
+            updateAllCounters();
+            updatePropertiesPanel();
+        });
+
+        // Boshlang'ich hisoblash
+        updateAllCounters();
+        
+        // Chart.js statistika
+        initChart();
+    });
+
+    // Quill buyruqlarini bajarish
+    function execQuill(format, value = null) {
+        if (!quill) return;
+        if (format === 'bold' || format === 'italic' || format === 'underline' || format === 'strike') {
+            quill.format(format, true);
+        } else if (format === 'align') {
+            quill.format('align', value);
+        } else if (format === 'list') {
+            quill.format('list', value);
+        } else if (format === 'indent') {
+            quill.format('indent', value);
+        } else if (format === 'copy' || format === 'cut' || format === 'paste') {
+            document.execCommand(format);
+        } else {
+            console.log('Not implemented:', format);
+        }
+        quill.focus();
+    }
+
+    // Shrift o'zgartirish
+    function changeFont() {
+        let font = document.getElementById('fontFamily').value;
+        quill.format('font', font);
+    }
+    function changeSize() {
+        let size = document.getElementById('fontSize').value;
+        quill.format('size', size);
+    }
+    function changeColor() {
+        let color = document.getElementById('textColor').value;
+        quill.format('color', color);
+    }
+    function changeBgColor() {
+        let color = document.getElementById('bgColor').value;
+        quill.format('background', color);
+    }
+
+    // Rasm qo'shish
+    function insertImage() {
+        let modal = new bootstrap.Modal(document.getElementById('imageModal'));
+        modal.show();
+    }
+    function insertImageFromModal() {
+        let url = document.getElementById('imageUrl').value;
+        if (url) {
+            let range = quill.getSelection();
+            quill.insertEmbed(range.index, 'image', url);
+        }
+        let file = document.getElementById('imageFile').files[0];
+        if (file) {
+            // file ni base64 qilish (oddiy)
+            let reader = new FileReader();
+            reader.onload = function(e) {
+                let range = quill.getSelection();
+                quill.insertEmbed(range.index, 'image', e.target.result);
+            };
+            reader.readAsDataURL(file);
+        }
+        bootstrap.Modal.getInstance(document.getElementById('imageModal')).hide();
+    }
+
+    // Jadval qo'shish
+    function insertTable() {
+        let modal = new bootstrap.Modal(document.getElementById('tableModal'));
+        modal.show();
+    }
+    function insertTableFromModal() {
+        let rows = parseInt(document.getElementById('tableRows').value);
+        let cols = parseInt(document.getElementById('tableCols').value);
+        let tableHtml = '<table class="table table-bordered"><tbody>';
+        for (let r = 0; r < rows; r++) {
+            tableHtml += '<tr>';
+            for (let c = 0; c < cols; c++) {
+                tableHtml += '<td>Hujra</td>';
+            }
+            tableHtml += '</tr>';
+        }
+        tableHtml += '</tbody></table>';
+        let range = quill.getSelection();
+        quill.clipboard.dangerouslyPasteHTML(range.index, tableHtml);
+        bootstrap.Modal.getInstance(document.getElementById('tableModal')).hide();
+    }
+
+    function insertLink() {
+        let url = prompt("Link manzilini kiriting:", "https://");
+        if (url) {
+            let range = quill.getSelection();
+            quill.format('link', url);
+        }
+    }
+
+    function insertDate() {
+        let date = moment().format('DD.MM.YYYY');
+        quill.insertText(quill.getSelection().index, date);
+    }
+
+    function undo() { quill.history.undo(); }
+    function redo() { quill.history.redo(); }
+
+    // Barcha hisoblagichlarni yangilash
+    function updateAllCounters() {
+        if (!quill) return;
+        let text = quill.getText();
+        let words = text.trim().split(/\s+/).filter(w => w.length > 0).length;
+        let chars = text.length;
+        let charsNoSpace = text.replace(/\s+/g, '').length;
+        let paragraphs = text.split(/\n/).filter(p => p.trim().length > 0).length;
+
+        document.getElementById('liveWordCount').innerText = `So'z: ${words} | Belgi: ${chars}`;
+        document.getElementById('statusWords').innerText = words;
+        document.getElementById('statusChars').innerText = chars;
+        document.getElementById('statWords').innerText = words;
+        document.getElementById('statChars').innerText = chars;
+        document.getElementById('statParas').innerText = paragraphs;
+        
+        // Detail modal uchun
+        document.getElementById('statsWordsDetail').innerText = words;
+        document.getElementById('statsCharsWithSpace').innerText = chars;
+        document.getElementById('statsCharsNoSpace').innerText = charsNoSpace;
+        document.getElementById('statsParagraphs').innerText = paragraphs;
+    }
+
+    function updatePropertiesPanel() {
+        if (!quill) return;
+        let range = quill.getSelection();
+        if (range) {
+            let format = quill.getFormat(range);
+            document.getElementById('showFontSize').innerText = format.size || '12px';
+            let align = format.align || 'left';
+            let alignText = { 'left': 'Chap', 'center': 'Markaz', 'right': 'O`ng', 'justify': 'Eniga' };
+            document.getElementById('showAlign').innerText = alignText[align] || 'Chap';
+        }
+    }
+
+    // Chart yaratish
+    function initChart() {
+        let ctx = document.getElementById('statsChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['So\'zlar', 'Belgilar', 'Xatboshilar'],
+                datasets: [{
+                    data: [0, 0, 0],
+                    backgroundColor: ['#2b579a', '#28a745', '#ffc107']
+                }]
+            }
+        });
+    }
+
+    // Sahifalar almashish
+    function switchDocument(id) {
+        document.querySelectorAll('.document-thumb').forEach(el => el.classList.remove('active'));
+        document.getElementById('doc' + id).classList.add('active');
+        if (id === 1) quill.setText('Hujjat 1 matni...');
+        else if (id === 2) quill.setText('Hujjat 2 matni...');
+        else quill.setText('Hujjat 3 matni...');
+        toastr.success('Hujjat almashtirildi');
+    }
+
+    function newDocument() {
+        quill.setText('');
+        toastr.info('Yangi hujjat yaratildi');
+    }
+
+    // Django saqlash
+    function getCSRF() {
+        return document.querySelector('#csrf-form input[name="csrfmiddlewaretoken"]').value;
+    }
+
+    function saveToDjango() {
+        let content = quill.root.innerHTML;
+        let title = "Django Hujjat " + moment().format('YYYY-MM-DD HH:mm');
+        
+        fetch('/save-document/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCSRF()
+            },
+            body: JSON.stringify({ title: title, content: content, word_count: document.getElementById('statusWords').innerText })
+        })
+        .then(res => res.json())
+        .then(data => {
+            toastr.success('Hujjat Django-ga saqlandi! ID: ' + data.id);
+        })
+        .catch(err => {
+            toastr.error('Xatolik: ' + err.message);
+        });
+    }
+
+    function loadFromDjango() {
+        fetch('/last-document/', {
+            headers: { 'X-CSRFToken': getCSRF() }
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.content) {
+                quill.root.innerHTML = data.content;
+                toastr.success('Hujjat yuklandi: ' + data.title);
+            } else toastr.warning('Hujjat topilmadi');
+        })
+        .catch(err => toastr.error(err.message));
+    }
+
+    function exportPDF() {
+        let element = document.getElementById('paperContainer');
+        html2pdf().from(element).set({
+            margin: [0.5, 0.5, 0.5, 0.5],
+            filename: 'django_hujjat.pdf',
+            html2canvas: { scale: 2 },
+            jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+        }).save();
+    }
+
+    function printDoc() { window.print(); }
+    function findReplace() { alert('Topish oynasi (Ctrl+F)'); }
+    function wordCount() { new bootstrap.Modal(document.getElementById('statsModal')).show(); }
+    function exportHTML() { prompt('HTML kod:', quill.root.innerHTML); }
+    function showHistory() { alert('Versiyalar tarixi (Django modelida)'); }
+
+    // Qo'shimcha: rang tanlash
+</script>
+
+<!-- Dastlabki chart ma'lumotlarini yangilash -->
+</body>
+</html>

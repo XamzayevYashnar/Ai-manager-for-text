@@ -79,7 +79,11 @@ USE_TZ = True
 # ===== Static & Media =====
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
-STATICFILES_DIRS = [BASE_DIR / 'static']
+STATICFILES_DIRS = [
+    BASE_DIR / 'static',            # umumiy static papka
+    BASE_DIR / 'editor/static',     # app static papka
+    BASE_DIR / 'users/static',      # user app static papka
+]
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'

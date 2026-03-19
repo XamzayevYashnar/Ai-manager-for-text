@@ -49,6 +49,10 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'config.urls'
 
+CSRF_TRUSTED_ORIGINS = [
+    "https://my-ai-app.onrender.com"
+]
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',

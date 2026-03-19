@@ -2,8 +2,10 @@ from pathlib import Path
 from dotenv import load_dotenv
 import os
 
+# ===== Base =====
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Load environment variables
 load_dotenv()
 
 # ===== Security =====
@@ -25,6 +27,7 @@ INSTALLED_APPS = [
     'users',
 ]
 
+# ===== Middleware =====
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -79,10 +82,13 @@ USE_TZ = True
 # ===== Static & Media =====
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
-STATICFILES_DIRS = [
-    BASE_DIR / 'editor' / 'static',
-    BASE_DIR / 'users' / 'static',
-]
+
+# Agar papkalar deployda yo‘q bo‘lsa, STATICFILES_DIRS bo‘sh qoldiriladi
+STATICFILES_DIRS = []
+for app in ['editor', 'users']:
+    static_path = BASE_DIR / app / 'static'
+    if static_path.exists():
+        STATICFILES_DIRS.append(static_path)
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'

@@ -12,7 +12,7 @@ load_dotenv()
 SECRET_KEY = os.getenv("SECRET_KEY", "django-insecure-default-key")
 DEBUG = os.getenv("DEBUG", "False") == "True"
 
-ALLOWED_HOSTS = ["ai-manager-for-text.onrender.com"]  # Render URL
+ALLOWED_HOSTS = ['*'] 
 CSRF_TRUSTED_ORIGINS = ["https://ai-manager-for-text.onrender.com"]
 
 # ===== Installed apps =====
@@ -30,6 +30,7 @@ INSTALLED_APPS = [
 # ===== Middleware =====
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -75,7 +76,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 # ===== Internationalization =====
 LANGUAGE_CODE = 'en-us'
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Tashkent'
 USE_I18N = True
 USE_TZ = True
 
@@ -83,6 +84,7 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'  # collectstatic keyin barcha fayllar shu yerga tushadi
 STATICFILES_DIRS = [BASE_DIR / 'editor' / 'static', BASE_DIR / 'users' / 'static']
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
